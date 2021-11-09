@@ -8,19 +8,19 @@ chai.use(chaiHttp);
 suite('Functional Tests', function() {
     suite('GET /api/stock-prices => stockData object', function() {
       
-      test('1 stock', function(done) {
+      test('Viewing one stock', function(done) {
        chai.request(server)
         .get('/api/stock-prices')
         .query({stock: 'goog'})
         .end(function(err, res){
           assert.equal(res.body['stockData']['stock'], 'goog')
           assert.isNotNull(res.body['stockData']['price'])
-           assert.isNotNull(res.body['stockData']['likes'])
+          assert.isNotNull(res.body['stockData']['likes'])
           done();
         });
       });
       
-      test('1 stock with like', function(done) {
+      test('Viewing one stock w/ like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
         .query({stock: 'aapl', like: true})
@@ -31,17 +31,17 @@ suite('Functional Tests', function() {
         });
       });
       
-      test('1 stock with like again (ensure likes arent double counted)', function(done) {
+      test('Viewing one stock w/ like again', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
         .query({stock: 'aapl', like: true})
         .end(function(err, res){
-          assert.equal(res.body, 'Error: Only 1 Like per IP Allowed')
+          assert.equal(res.body, 'Error: You can like only once per IP')
           done()
         });
       });
-      
-      test('2 stocks', function(done) {
+
+      test('Viewing two stocks', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
         .query({stock: ['aapl', 'amzn']})
@@ -67,8 +67,8 @@ suite('Functional Tests', function() {
           done()
         });
       });
-      
-      test('2 stocks with like', function(done) {
+
+      test('Viewing two stocks w/ like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
         .query({stock: ['spot', 'amzn'], like: true})
@@ -92,8 +92,9 @@ suite('Functional Tests', function() {
           done()
         });
       });
-    });
-});
+     
+    }); //GET
+}); // Functional tests
 
 
 

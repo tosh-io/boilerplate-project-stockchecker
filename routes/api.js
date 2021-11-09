@@ -7,7 +7,7 @@ let XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 
 module.exports = function (app) {
   
-  let uri = "mongodb+srv://?????os:est????@m0ngodb.qi6f5.mongodb.net/stock_price_checker?retryWrites=true&w=majority";
+  let uri = "mongodb+srv://?????:umasenhaqqr@m0ngodb.qi6f5.mongodb.net/stock_price_checker?retryWrites=true&w=majority";
 
   mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   
@@ -53,7 +53,7 @@ module.exports = function (app) {
       let likeStock = (stockName, nextStep) => {
          Stock.findOne({name: stockName}, (error, stockDocument) => {
             if(!error && stockDocument && stockDocument['ips'] && stockDocument['ips'].includes(req.ip)){
-                return res.json('Error: You can like only once')
+                return res.json('Error: You can like only once per IP')
             }else{
                 let documentUpdate = {$inc: {likes: 1}, $push: {ips: req.ip}}
                 nextStep(stockName, documentUpdate, getPriceFromSource)
@@ -82,16 +82,20 @@ module.exports = function (app) {
         nextStep()
       }
 
-      let stocks = []        
+      let stocks = []
+      let stocks_like = []              
       let process2Stocks = (stockDocument, nextStep) => {
         let newStock = {}
+        let newStock_like = {}
         newStock['stock'] = stockDocument['name']
         newStock['price'] = stockDocument['price']
-        newStock['likes'] = stockDocument['likes']
+        newStock['likes'] = stockDocument['likes']        
         stocks.push(newStock)
+        newStock_like['likes'] = stockDocument['likes']
+        stocks_like.push(newStock_like)
         if(stocks.length === 2){
-          stocks[0]['rel_likes'] = stocks[0]['likes'] - stocks[1]['likes']
-          stocks[1]['rel_likes'] = stocks[1]['likes'] - stocks[0]['likes']
+          stocks[0]['rel_likes'] = stocks_like[0]['likes'] - stocks_like[1]['likes']
+          stocks[1]['rel_likes'] = stocks_like[1]['likes'] - stocks_like[0]['likes']
           responseObject['stockData'] = stocks
           nextStep()
         }else{
